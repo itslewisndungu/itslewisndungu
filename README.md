@@ -1,4 +1,4 @@
-# Hi 👋 I'm Lewis Ndung'u.
+# Hi. 👋 I'm Lewis Ndung'u.
 
 I'm currently learning all about [Remix.run](https://remix.run), Vim, and Shell scripting, all while using [Nextjs](https://next.org) and [Angular](https://angular.io) on some side projects 😺.
 
