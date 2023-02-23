@@ -11,18 +11,18 @@
 	/>
 </svelte:head>
 
-<main class="flex flex-col gap-8 p-5">
-	<h1 class="text-4xl md:text-5xl text-gray-900">Hello there! I'm Lewis Ndung'u</h1>
+<main class="flex flex-col gap-8 md:gap-9 p-5">
+	<h1 class="text-4xl md:text-5xl text-gray-900">Hi there! I'm Lewis Ndung'u</h1>
 
 	<div class="flex flex-col gap-1 m-t-35 m-b-40">
-		<p class="text-lg text-slate-900">A software developer from Kenya.</p>
+		<p class="md:text-lg text-gray-900">A software developer from Kenya.</p>
 
-		<p class="text-lg text-slate-900">
-			I do mostly web development (Typescript, React, Svelte, Python, Go).
+		<p class="text-lg text-gray-900">
+			I mostly do web development <br /> (Typescript, React, Svelte, Tailwindcss, Python, Go).
 		</p>
 
-		<p class="text-lg text-slate-900 ">
-			I'm currently a computer science major at
+		<p class="text-lg text-gray-900 ">
+			Currently a computer science major at
 			<a class="link" href="https://www.ku.ac.ke/" target="_blank" rel="noreferrer noopener"
 				>Kenyatta University</a
 			>
