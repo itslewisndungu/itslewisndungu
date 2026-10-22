@@ -1,0 +1,44 @@
+---
+import type { ImageMetadata } from "astro";
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { SITE_DEFAULT_TITLE, SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: ImageMetadata;
+}
+
+const { title, description = SITE_DESCRIPTION, image } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="h-full antialiased">
+	<head>
+		<BaseHead
+			title={title ? `${title} - ${SITE_TITLE}` : SITE_DEFAULT_TITLE}
+			description={description}
+			image={image}
+		/>
+	</head>
+	<body class="flex h-full bg-zinc-50 dark:bg-black">
+		<div class="flex w-full">
+			<div class="fixed inset-0 flex justify-center sm:px-8">
+				<div class="flex w-full max-w-7xl lg:px-8">
+					<div
+						class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"
+					></div>
+				</div>
+			</div>
+			<div class="relative flex w-full flex-col">
+				<Header />
+				<main class="flex-auto">
+					<slot />
+				</main>
+				<Footer />
+			</div>
+		</div>
+	</body>
+</html>

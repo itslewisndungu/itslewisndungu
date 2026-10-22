@@ -5,8 +5,15 @@
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
+	"html": {
+		"experimentalFullSupportEnabled": true,
+		"formatter": {
+			"enabled": true
+		}
+	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!src/assets"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -29,6 +36,11 @@
 			"source": {
 				"organizeImports": "on"
 			}
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
 		}
 	}
 }
