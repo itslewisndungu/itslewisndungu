@@ -1,0 +1,11 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import ContainerInner from "./ContainerInner.astro";
+import ContainerOuter from "./ContainerOuter.astro";
+
+type Props = HTMLAttributes<"div">;
+---
+
+<ContainerOuter {...Astro.props}>
+  <ContainerInner><slot /></ContainerInner>
+</ContainerOuter>

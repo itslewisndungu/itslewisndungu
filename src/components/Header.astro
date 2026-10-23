@@ -1,87 +1,223 @@
 ---
-import { SITE_TITLE } from '../consts';
-import HeaderLink from './HeaderLink.astro';
+import { NAVIGATION as navigation } from "../consts";
+import Avatar from "./Avatar.astro";
+import Container from "./Container.astro";
+
+const pathname = Astro.url.pathname.replace(/(.)\/$/, "$1");
+const isHomePage = pathname === "/";
+
+const avatarContainerClass =
+  "h-10 w-10 rounded-full bg-white/90 p-0.5 shadow-lg ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:ring-white/10";
 ---
 
-<header>
-	<nav>
-		<h2>
-			<a href="/">{SITE_TITLE}</a>
-		</h2>
-		<div class="internal-links">
-			<HeaderLink href="/">Home</HeaderLink>
-			<HeaderLink href="/blog">Blog</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
-		</div>
-		<div class="social-links">
-			<a href="https://m.webtoo.ls/@astro" target="_blank">
-				<span class="sr-only">Follow Astro on Mastodon</span>
-				<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
-					<path
-						fill="currentColor"
-						d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"
-					></path>
-				</svg>
-			</a>
-			<a href="https://twitter.com/astrodotbuild" target="_blank">
-				<span class="sr-only">Follow Astro on Twitter</span>
-				<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
-					<path
-						fill="currentColor"
-						d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"
-					></path>
-				</svg>
-			</a>
-			<a href="https://github.com/withastro/astro" target="_blank">
-				<span class="sr-only">Go to Astro's GitHub repo</span>
-				<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
-					<path
-						fill="currentColor"
-						d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-					></path>
-				</svg>
-			</a>
-		</div>
-	</nav>
+<header
+  class="pointer-events-none relative z-50 flex flex-none flex-col"
+  style="height: var(--header-height); margin-bottom: var(--header-mb)"
+  data-header
+  data-home={isHomePage ? "" : undefined}
+>
+  {isHomePage && (
+    <>
+      <div
+        class="order-last mt-[calc(--spacing(16)-(--spacing(3)))]"
+        data-avatar
+      />
+      <Container
+        class="top-0 order-last -mb-3 pt-3"
+        style="position: var(--header-position)"
+      >
+        <div
+          class="top-(--avatar-top,--spacing(3)) w-full"
+          style="position: var(--header-inner-position)"
+        >
+          <div class="relative">
+            <div
+              class:list={[
+                avatarContainerClass,
+                "absolute top-3 left-0 origin-left transition-opacity",
+              ]}
+              style="opacity: var(--avatar-border-opacity, 0); transform: var(--avatar-border-transform)"
+            />
+            <Avatar
+              large
+              class="block h-16 w-16 origin-left"
+              style="transform: var(--avatar-image-transform)"
+            />
+          </div>
+        </div>
+      </Container>
+    </>
+  )}
+  <div
+    class="top-0 z-10 h-16 pt-6"
+    style="position: var(--header-position)"
+    data-header-bar
+  >
+    <Container
+      class="top-(--header-top,--spacing(6)) w-full"
+      style="position: var(--header-inner-position)"
+    >
+      <div class="relative flex gap-4">
+        <div class="flex flex-1">
+          {!isHomePage && (
+            <div class={avatarContainerClass}>
+              <Avatar />
+            </div>
+          )}
+        </div>
+        <div class="flex flex-1 justify-end md:justify-center">
+          <!-- Mobile navigation -->
+          <div class="pointer-events-auto md:hidden">
+            <button
+              type="button"
+              class="group flex items-center rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-zinc-800 shadow-lg ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10 dark:hover:ring-white/20"
+              aria-haspopup="dialog"
+              data-mobile-nav-open
+            >
+              Menu
+              <svg
+                viewBox="0 0 8 6"
+                aria-hidden="true"
+                class="ml-3 h-auto w-2 stroke-zinc-500 group-hover:stroke-zinc-700 dark:group-hover:stroke-zinc-400"
+              >
+                <path
+                  d="M1.75 1.75 4 4.25l2.25-2.5"
+                  fill="none"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+            </button>
+            <dialog
+              aria-label="Navigation"
+              class="fixed inset-x-4 top-8 z-50 w-auto max-w-none origin-top scale-95 rounded-3xl bg-white p-8 opacity-0 ring-1 ring-zinc-900/5 transition-[opacity,scale,display,overlay] transition-discrete duration-150 ease-in backdrop:bg-zinc-800/40 backdrop:opacity-0 backdrop:backdrop-blur-xs backdrop:transition-[opacity,display,overlay] backdrop:transition-discrete backdrop:duration-150 open:scale-100 open:opacity-100 open:ease-out open:backdrop:opacity-100 starting:open:scale-95 starting:open:opacity-0 starting:open:backdrop:opacity-0 dark:bg-zinc-900 dark:ring-zinc-800 dark:backdrop:bg-black/80"
+              data-mobile-nav
+            >
+              <div class="flex flex-row-reverse items-center justify-between">
+                <button
+                  type="button"
+                  aria-label="Close menu"
+                  class="-m-1 p-1"
+                  data-mobile-nav-close
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    class="h-6 w-6 text-zinc-500 dark:text-zinc-400"
+                  >
+                    <path
+                      d="m17.25 6.75-10.5 10.5M6.75 6.75l10.5 10.5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                </button>
+                <h2
+                  class="text-sm font-medium text-zinc-600 dark:text-zinc-400"
+                >
+                  Navigation
+                </h2>
+              </div>
+              <nav class="mt-6">
+                <ul
+                  class="-my-2 divide-y divide-zinc-100 text-base text-zinc-800 dark:divide-zinc-100/5 dark:text-zinc-300"
+                >
+                  {navigation.map((item) => (
+                    <li>
+                      <a href={item.href} class="block py-2">
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </dialog>
+          </div>
+          <!-- Desktop navigation -->
+          <nav class="pointer-events-auto hidden md:block">
+            <ul
+              class="flex rounded-full bg-white/90 px-3 text-sm font-medium text-zinc-800 shadow-lg ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10"
+            >
+              {navigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <li>
+                    <a
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      class:list={[
+                        "relative block px-3 py-2 transition",
+                        isActive
+                          ? "text-teal-500 dark:text-teal-400"
+                          : "hover:text-teal-500 dark:hover:text-teal-400",
+                      ]}
+                    >
+                      {item.label}
+                      {isActive && (
+                        <span class="absolute inset-x-1 -bottom-px h-px bg-linear-to-r from-teal-500/0 via-teal-500/40 to-teal-500/0 dark:from-teal-400/0 dark:via-teal-400/40 dark:to-teal-400/0" />
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+        <div class="flex justify-end md:flex-1">
+          <div class="pointer-events-auto">
+            <button
+              type="button"
+              aria-label="Toggle theme"
+              class="group rounded-full bg-white/90 px-3 py-2 shadow-lg ring-1 shadow-zinc-800/5 ring-zinc-900/5 backdrop-blur-sm transition dark:bg-zinc-800/90 dark:ring-white/10 dark:hover:ring-white/20"
+              data-theme-toggle
+            >
+              <svg
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                class="h-6 w-6 fill-zinc-100 stroke-zinc-500 transition group-hover:fill-zinc-200 group-hover:stroke-zinc-700 dark:hidden [@media(prefers-color-scheme:dark)]:fill-teal-50 [@media(prefers-color-scheme:dark)]:stroke-teal-500 [@media(prefers-color-scheme:dark)]:group-hover:fill-teal-50 [@media(prefers-color-scheme:dark)]:group-hover:stroke-teal-600"
+              >
+                <path
+                  d="M8 12.25A4.25 4.25 0 0 1 12.25 8v0a4.25 4.25 0 0 1 4.25 4.25v0a4.25 4.25 0 0 1-4.25 4.25v0A4.25 4.25 0 0 1 8 12.25v0Z"
+                ></path>
+                <path
+                  d="M12.25 3v1.5M21.5 12.25H20M18.791 18.791l-1.06-1.06M18.791 5.709l-1.06 1.06M12.25 20v1.5M4.5 12.25H3M6.77 6.77 5.709 5.709M6.77 17.73l-1.061 1.061"
+                  fill="none"
+                ></path>
+              </svg>
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                class="hidden h-6 w-6 fill-zinc-700 stroke-zinc-500 transition not-[@media_(prefers-color-scheme:dark)]:fill-teal-400/10 not-[@media_(prefers-color-scheme:dark)]:stroke-teal-500 dark:block [@media(prefers-color-scheme:dark)]:group-hover:stroke-zinc-400"
+              >
+                <path
+                  d="M17.25 16.22a6.937 6.937 0 0 1-9.47-9.47 7.451 7.451 0 1 0 9.47 9.47ZM12.75 7C17 7 17 2.75 17 2.75S17 7 21.25 7C17 7 17 11.25 17 11.25S17 7 12.75 7Z"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Container>
+  </div>
 </header>
-<style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		background: white;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
+{isHomePage && <div class="flex-none" style="height: var(--content-offset)" />}
 
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-	}
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	nav a {
-		padding: 1em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-	}
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
-	}
-	.social-links,
-	.social-links a {
-		display: flex;
-	}
-	@media (max-width: 720px) {
-		.social-links {
-			display: none;
-		}
-	}
-</style>
+<script>
+import { initHeader } from "../lib/header";
+import { initMobileNavigation } from "../lib/mobileNavigation";
+import { initThemeToggle } from "../lib/theme";
+
+initHeader();
+initMobileNavigation();
+initThemeToggle();
+</script>

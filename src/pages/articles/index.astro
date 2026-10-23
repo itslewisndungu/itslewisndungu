@@ -1,0 +1,56 @@
+---
+import Card from "../../components/card/Card.astro";
+import CardCta from "../../components/card/CardCta.astro";
+import CardDescription from "../../components/card/CardDescription.astro";
+import CardEyebrow from "../../components/card/CardEyebrow.astro";
+import CardTitle from "../../components/card/CardTitle.astro";
+import SimpleLayout from "../../components/SimpleLayout.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getAllArticles } from "../../lib/articles";
+import { formatDate, toDateTime } from "../../lib/formatDate";
+
+const articles = await getAllArticles();
+---
+
+<Layout
+  title="Articles"
+  description="Herein lies some of the thoughts I am mulling over, ranging all from tech stuff to psychology ideas, or stuff i am trying to implement and adopt to my life."
+>
+  <SimpleLayout
+    title="My writing on various topics, ranging from tech to psychology"
+    intro="On this page, I plan to have several writeups of things that I find interesting, or things that I am mulling over. More to come soon ⏰..."
+  >
+    <div
+      class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40"
+    >
+      <div class="flex max-w-3xl flex-col space-y-16">
+        {articles.map((article) => (
+          <article class="md:grid md:grid-cols-4 md:items-baseline">
+            <Card class="md:col-span-3">
+              <CardTitle href={`/articles/${article.id}`}>
+                {article.data.title}
+              </CardTitle>
+              <CardEyebrow
+                as="time"
+                datetime={toDateTime(article.data.date)}
+                class="md:hidden"
+                decorate
+              >
+                {formatDate(article.data.date)}
+              </CardEyebrow>
+              <CardDescription>{article.data.description}</CardDescription>
+              <CardCta>Read article</CardCta>
+            </Card>
+            <CardEyebrow
+              as="time"
+              datetime={toDateTime(article.data.date)}
+              class="mt-1 max-md:hidden"
+            >
+              {formatDate(article.data.date)}
+            </CardEyebrow>
+          </article>
+        ))}
+      </div>
+    </div>
+  </SimpleLayout>
+</Layout>

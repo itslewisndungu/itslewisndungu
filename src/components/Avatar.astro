@@ -1,0 +1,26 @@
+---
+import { Image } from "astro:assets";
+import type { HTMLAttributes } from "astro/types";
+import avatarImage from "../assets/images/avatar.png";
+
+type Props = Omit<HTMLAttributes<"a">, "href"> & {
+  large?: boolean;
+};
+
+const { large = false, class: className, ...props } = Astro.props;
+---
+
+<a href="/" class:list={[className, "pointer-events-auto"]} {...props}>
+  <Image
+    src={avatarImage}
+    alt=""
+    width={large ? 64 : 36}
+    densities={[1, 2]}
+    loading="eager"
+    class:list={[
+      "rounded-full bg-zinc-100 object-cover dark:bg-zinc-800",
+      large ? "h-16 w-16" : "h-9 w-9",
+    ]}
+  />
+  <span class="sr-only">Home</span>
+</a>

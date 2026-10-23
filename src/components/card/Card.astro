@@ -1,0 +1,14 @@
+---
+import type { HTMLTag, Polymorphic } from "astro/types";
+
+type Props<Tag extends HTMLTag = "div"> = Polymorphic<{ as: Tag }>;
+
+const { as: Tag = "div", class: className, ...props } = Astro.props;
+---
+
+<Tag
+  class:list={[className, "group relative flex flex-col items-start"]}
+  {...props}
+>
+  <slot />
+</Tag>
