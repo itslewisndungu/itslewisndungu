@@ -1,13 +1,21 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
-
 export const SITE_TITLE = "Lewis Ndung'u";
+
 export const SITE_DEFAULT_TITLE =
-  "Lewis Ndung'u - Software designer, founder, and amateur astronaut";
+  "Lewis Ndung'u - Software engineer, amateur cyclist and avid hiker.";
+
 export const SITE_DESCRIPTION =
-  "I’m Lewis, a software designer and entrepreneur based in New York City. I’m the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms.";
+  "I’m Lewis, a software engineer based in Nairobi, Kenya. This is my personal website where you can get a glimpse of my life, thoughts and some of my work.";
 
 export const AUTHOR = {
   name: "Lewis Ndung'u",
-  email: "Lewisitslewisndungu@gmail.com",
+  email: "itslewisndungu@gmail.com",
 };
+
+// Shared by the header and footer navigation.
+export const NAVIGATION = [
+  // { href: "/about", label: "About" },
+  { href: "/articles", label: "Articles" },
+  { href: "/projects", label: "Projects" },
+  { href: "/spotify", label: "Spotify" },
+  { href: "/quips", label: "Quips" },
+];

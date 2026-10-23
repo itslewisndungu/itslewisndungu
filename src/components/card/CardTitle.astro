@@ -3,21 +3,21 @@ import type { HTMLTag } from "astro/types";
 import CardLink from "./CardLink.astro";
 
 interface Props {
-	as?: HTMLTag;
-	href?: string;
+  as?: HTMLTag;
+  href?: string;
 }
 
 const { as: Tag = "h2", href } = Astro.props;
 ---
 
 <Tag
-	class="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100"
+  class="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100"
 >
-	{href ? (
-		<CardLink href={href}>
-			<slot />
-		</CardLink>
-	) : (
-		<slot />
-	)}
+  {href ? (
+    <CardLink href={href}>
+      <slot />
+    </CardLink>
+  ) : (
+    <slot />
+  )}
 </Tag>
