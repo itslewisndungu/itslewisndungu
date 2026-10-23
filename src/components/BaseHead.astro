@@ -4,6 +4,7 @@
 import "../styles/global.css";
 import { getImage } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 import FallbackImage from "../assets/images/photos/jahazii-playful-grayscale.jpg";
 import { SITE_TITLE } from "../consts";
 
@@ -65,3 +66,5 @@ const ogImage = await getImage({ src: image, width: 1200, format: "jpg" });
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
+
+<SpeedInsights />
