@@ -3,8 +3,9 @@
 // all pages through the use of the <BaseHead /> component.
 import "../styles/global.css";
 import { getImage } from "astro:assets";
-import type { ImageMetadata } from "astro";
+import Analytics from "@vercel/analytics/astro";
 import SpeedInsights from "@vercel/speed-insights/astro";
+import type { ImageMetadata } from "astro";
 import FallbackImage from "../assets/images/photos/jahazii-playful-grayscale.jpg";
 import { SITE_TITLE } from "../consts";
 
@@ -68,3 +69,4 @@ const ogImage = await getImage({ src: image, width: 1200, format: "jpg" });
 <meta name="twitter:card" content="summary_large_image">
 
 <SpeedInsights />
+<Analytics />
