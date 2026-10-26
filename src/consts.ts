@@ -7,7 +7,15 @@ export const SITE_DESCRIPTION =
 
 export const AUTHOR = {
   name: "Lewis Ndung'u",
+  // The spelling people search with when they skip the apostrophe.
+  alternateName: "Lewis Ndungu",
   email: "itslewisndungu@gmail.com",
+  jobTitle: "Software Engineer",
+  // Used as `sameAs` in the structured data.
+  profiles: [
+    "https://github.com/itslewisndungu",
+    "https://www.linkedin.com/in/itslewisndungu",
+  ],
 };
 
 // Shared by the header and footer navigation.

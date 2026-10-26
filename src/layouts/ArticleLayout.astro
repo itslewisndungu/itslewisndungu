@@ -12,7 +12,11 @@ interface Props {
 const { article } = Astro.props;
 ---
 
-<Layout title={article.title} description={article.description}>
+<Layout
+  title={article.title}
+  description={article.description}
+  article={article}
+>
   <Container class="mt-16 lg:mt-32">
     <div class="xl:relative">
       <div class="mx-auto max-w-2xl">
