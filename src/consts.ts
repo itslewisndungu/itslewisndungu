@@ -3,7 +3,7 @@ export const SITE_TITLE = "Lewis Ndung'u";
 export const SITE_DEFAULT_TITLE = "Lewis Ndung'u - Software Engineer";
 
 export const SITE_DESCRIPTION =
-  "I’m Lewis, a Software Engineer based in Nairobi, Kenya. This is my personal website where you can get a glimpse of my life, thoughts and some of my work.";
+  "I’m Lewis, a software engineer based in Nairobi, Kenya. This is my personal website, where you can get a glimpse of my life, thoughts and some of my work.";
 
 export const AUTHOR = {
   name: "Lewis Ndung'u",
