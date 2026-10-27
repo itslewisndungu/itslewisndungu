@@ -91,5 +91,12 @@ Astro.response.headers.set(
 <script>
 import { initNowPlaying } from "../../lib/nowPlaying";
 
-initNowPlaying();
+// Module scripts run once, so re-initialise against each page's fresh DOM.
+document.addEventListener("astro:page-load", () => {
+  const cleanupNowPlaying = initNowPlaying();
+
+  document.addEventListener("astro:before-swap", () => cleanupNowPlaying?.(), {
+    once: true,
+  });
+});
 </script>

@@ -32,6 +32,10 @@ export function initNowPlaying() {
 
   let current: NowPlaying | null = JSON.parse(root.dataset.initial ?? "null");
   let timer: number | undefined;
+  // Aborted by the returned cleanup, so polling stops when the page is
+  // swapped out by a client-side navigation.
+  const controller = new AbortController();
+  const { signal } = controller;
 
   function render(nowPlaying: NowPlaying | null) {
     if (!card || !empty) return;
@@ -71,7 +75,7 @@ export function initNowPlaying() {
 
   function schedule(delay: number) {
     window.clearTimeout(timer);
-    if (!document.hidden) {
+    if (!signal.aborted && !document.hidden) {
       timer = window.setTimeout(check, delay);
     }
   }
@@ -79,7 +83,10 @@ export function initNowPlaying() {
   async function check() {
     try {
       const response = await fetch(ENDPOINT, {
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.any([
+          signal,
+          AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        ]),
       });
       if (!response.ok) {
         throw new Error(`Now playing request failed: ${response.status}`);
@@ -92,15 +99,24 @@ export function initNowPlaying() {
     }
   }
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      window.clearTimeout(timer);
-    } else {
-      check();
-    }
-  });
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        window.clearTimeout(timer);
+      } else {
+        check();
+      }
+    },
+    { signal },
+  );
 
   schedule(
     root.dataset.failed !== undefined ? MAX_WAIT_MS : nextDelay(current),
   );
+
+  return () => {
+    controller.abort();
+    window.clearTimeout(timer);
+  };
 }

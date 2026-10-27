@@ -48,29 +48,31 @@ function applyTheme(theme: Theme) {
   setTimeout(() => style.remove(), 1);
 }
 
-export function initThemeToggle() {
-  const button = document.querySelector<HTMLButtonElement>(
-    "[data-theme-toggle]",
-  );
+function getToggleButton() {
+  return document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+}
 
-  function updateLabel() {
-    const otherTheme = getResolvedTheme() === "dark" ? "light" : "dark";
-    button?.setAttribute("aria-label", `Switch to ${otherTheme} theme`);
+// Look the button up each time: client-side navigation replaces it.
+function updateLabel() {
+  const otherTheme = getResolvedTheme() === "dark" ? "light" : "dark";
+  getToggleButton()?.setAttribute("aria-label", `Switch to ${otherTheme} theme`);
+}
+
+// Registered once at module scope so navigations don't stack listeners.
+media.addEventListener("change", () => {
+  const stored = getStoredTheme();
+  if (stored === getSystemTheme()) {
+    storeTheme(null);
   }
+  applyTheme(getStoredTheme() ?? getSystemTheme());
+  updateLabel();
+});
 
-  button?.addEventListener("click", () => {
+export function initThemeToggle() {
+  getToggleButton()?.addEventListener("click", () => {
     const theme = getResolvedTheme() === "dark" ? "light" : "dark";
     storeTheme(theme === getSystemTheme() ? null : theme);
     applyTheme(theme);
-    updateLabel();
-  });
-
-  media.addEventListener("change", () => {
-    const stored = getStoredTheme();
-    if (stored === getSystemTheme()) {
-      storeTheme(null);
-    }
-    applyTheme(getStoredTheme() ?? getSystemTheme());
     updateLabel();
   });
 

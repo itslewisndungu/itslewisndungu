@@ -217,7 +217,14 @@ import { initHeader } from "../lib/header";
 import { initMobileNavigation } from "../lib/mobileNavigation";
 import { initThemeToggle } from "../lib/theme";
 
-initHeader();
-initMobileNavigation();
-initThemeToggle();
+// Module scripts run once, so re-initialise against each page's fresh DOM.
+document.addEventListener("astro:page-load", () => {
+  const cleanupHeader = initHeader();
+  initMobileNavigation();
+  initThemeToggle();
+
+  document.addEventListener("astro:before-swap", () => cleanupHeader?.(), {
+    once: true,
+  });
+});
 </script>
