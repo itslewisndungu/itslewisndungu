@@ -1,6 +1,28 @@
 ---
+export const prerender = false;
+
 import SimpleLayout from "../../components/SimpleLayout.astro";
 import Layout from "../../layouts/Layout.astro";
+import {
+  getNowPlaying,
+  NOW_PLAYING_CACHE_CONTROL,
+  type NowPlaying,
+} from "../../lib/spotify";
+
+let nowPlaying: NowPlaying | null = null;
+let failed = false;
+
+try {
+  nowPlaying = await getNowPlaying();
+} catch (error) {
+  console.error(error);
+  failed = true;
+}
+
+Astro.response.headers.set(
+  "Cache-Control",
+  failed ? "no-store" : NOW_PLAYING_CACHE_CONTROL,
+);
 ---
 
 <Layout
@@ -10,5 +32,64 @@ import Layout from "../../layouts/Layout.astro";
   <SimpleLayout
     title="What am I listening to?"
     intro="I am an avid lover of music who listens to a whole bunch of music, whether I am working, cleaning, cooking, you name it. You can find what i'm currently listening to here."
-  />
+  >
+    <!-- Both states are always rendered so the client script can switch between them. -->
+    <div
+      data-now-playing
+      data-initial={JSON.stringify(nowPlaying)}
+      data-failed={failed ? "" : undefined}
+    >
+      <a
+        href={nowPlaying?.songUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden={!nowPlaying}
+        class="group flex max-w-md items-center gap-5 rounded-2xl p-4 ring-1 ring-zinc-100 transition hover:bg-zinc-50 dark:ring-zinc-700/40 dark:hover:bg-zinc-800/50"
+        data-now-playing-card
+      >
+        <img
+          src={nowPlaying?.albumImageUrl}
+          alt={nowPlaying ? `Album art for ${nowPlaying.album}` : ""}
+          width={80}
+          height={80}
+          hidden={!nowPlaying?.albumImageUrl}
+          class="h-20 w-20 flex-none rounded-lg object-cover"
+          data-field="image"
+        />
+        <div class="min-w-0">
+          <p
+            class="text-xs font-medium tracking-wide text-teal-500 uppercase"
+            data-field="status"
+          >
+            {nowPlaying?.isPlaying ? "Now playing" : "Paused"}
+          </p>
+          <p
+            class="mt-1 truncate text-base font-semibold text-zinc-800 group-hover:text-teal-500 dark:text-zinc-100"
+            data-field="title"
+          >
+            {nowPlaying?.title}
+          </p>
+          <p
+            class="truncate text-sm text-zinc-600 dark:text-zinc-400"
+            data-field="artist"
+          >
+            {nowPlaying?.artist}
+          </p>
+        </div>
+      </a>
+      <p
+        hidden={!!nowPlaying}
+        class="text-base text-zinc-600 dark:text-zinc-400"
+        data-now-playing-empty
+      >
+        Not listening to anything right now. Check back later.
+      </p>
+    </div>
+  </SimpleLayout>
 </Layout>
+
+<script>
+import { initNowPlaying } from "../../lib/nowPlaying";
+
+initNowPlaying();
+</script>
