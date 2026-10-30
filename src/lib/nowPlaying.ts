@@ -14,9 +14,7 @@ const REQUEST_TIMEOUT_MS = 12_000;
 
 export function initNowPlaying() {
   const root = document.querySelector<HTMLElement>("[data-now-playing]");
-  const card = root?.querySelector<HTMLAnchorElement>(
-    "[data-now-playing-card]",
-  );
+  const card = root?.querySelector<HTMLElement>("[data-now-playing-card]");
   const empty = root?.querySelector<HTMLElement>("[data-now-playing-empty]");
   if (!root || !card || !empty) {
     return;
@@ -29,6 +27,7 @@ export function initNowPlaying() {
     }
   };
   const image = card.querySelector<HTMLImageElement>('[data-field="image"]');
+  const link = card.querySelector<HTMLAnchorElement>('[data-field="link"]');
 
   let current: NowPlaying | null = JSON.parse(root.dataset.initial ?? "null");
   let timer: number | undefined;
@@ -46,7 +45,7 @@ export function initNowPlaying() {
       return;
     }
 
-    card.href = nowPlaying.songUrl;
+    if (link) link.href = nowPlaying.songUrl;
     setText("status", nowPlaying.isPlaying ? "Now playing" : "Paused");
     setText("title", nowPlaying.title);
     setText("artist", nowPlaying.artist);
@@ -54,6 +53,9 @@ export function initNowPlaying() {
     if (image) {
       image.hidden = !nowPlaying.albumImageUrl;
       if (nowPlaying.albumImageUrl) {
+        // srcset/sizes from <Image> would override the new src.
+        image.removeAttribute("srcset");
+        image.removeAttribute("sizes");
         image.src = nowPlaying.albumImageUrl;
       } else {
         image.removeAttribute("src");

@@ -4,6 +4,7 @@ export const prerender = false;
 import { Image } from "astro:assets";
 import SpotifyLogo from "../../assets/images/logos/spotify.svg";
 import SimpleLayout from "../../components/SimpleLayout.astro";
+import Artwork from "../../components/spotify/SpotifyArtwork.astro";
 import Layout from "../../layouts/Layout.astro";
 import {
   getNowPlaying,
@@ -43,38 +44,28 @@ Astro.response.headers.set(
     >
       <div
         hidden={!nowPlaying}
-        class="group flex items-start md:items-center gap-5 md:gap-8 rounded-2xl px-2 py-4 md:px-4"
+        class="group flex items-start gap-5 md:gap-10 rounded-2xl px-2 py-4 md:px-4"
         data-now-playing-card
       >
-        {nowPlaying?.albumImageUrl ? (
-          <Image
-            src={nowPlaying.albumImageUrl}
-            alt={`Album art for ${nowPlaying.album}`}
-            width={400}
-            height={400}
-            layout="constrained"
-            class="size-40 md:size-90 flex-none rounded-lg object-cover"
-            data-field="image"
-          />
-        ) : null}
+        <Artwork nowPlaying={nowPlaying} />
 
         <a
           href={nowPlaying?.songUrl}
           target="_blank"
           rel="noopener noreferrer"
           class="overflow-hidden"
-          hidden={!nowPlaying}
+          data-field="link"
         >
           <Image
             height={82}
             width={300}
-            class={"h-5 md:h-7 w-auto mt-2 md:mt-0"}
+            class={"h-5 md:h-7 w-auto mt-2 md:mt-10"}
             src={SpotifyLogo}
             alt="Spotify Logo"
           />
 
           <p
-            class="mt-2 md:mt-4 text-xs font-medium tracking-wide text-spotify-green uppercase"
+            class="mt-2 md:mt-5 text-xs font-medium tracking-wide text-spotify-green uppercase"
             data-field="status"
           >
             {nowPlaying?.isPlaying ? "Now playing" : "Paused"}
