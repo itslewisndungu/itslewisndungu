@@ -2,13 +2,15 @@
 
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
-import vercel from "@astrojs/vercel";
-
 // https://astro.build/config
 export default defineConfig({
+  server: {
+    host: true,
+  },
   site: "https://itslewisndungu.com",
   integrations: [mdx(), sitemap()],
 
@@ -21,4 +23,8 @@ export default defineConfig({
   },
 
   adapter: vercel(),
+
+  image: {
+    domains: ["spotify.com", "i.scdn.co"],
+  },
 });

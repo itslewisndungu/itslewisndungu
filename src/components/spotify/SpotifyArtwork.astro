@@ -1,0 +1,76 @@
+---
+import { Image } from "astro:assets";
+import type { NowPlaying } from "../../lib/spotify";
+
+interface Props {
+  nowPlaying: NowPlaying | null;
+}
+
+const { nowPlaying } = Astro.props;
+---
+
+{nowPlaying?.albumImageUrl ? (
+  <div class="perspective-distant">
+    <Image
+      id={"spotify-now-playing-artwork"}
+      src={nowPlaying.albumImageUrl}
+      alt={`Album art for ${nowPlaying.album}`}
+      width={400}
+      height={400}
+      layout="constrained"
+      class="size-40 md:size-90 flex-none rounded-lg object-cover"
+      data-field="image"
+    />
+  </div>
+) : (
+  <div class="perspective-distant">
+    <img
+      id="spotify-now-playing-artwork"
+      alt=""
+      hidden
+      class="size-40 md:size-90 flex-none rounded-lg object-cover"
+      data-field="image"
+    />
+  </div>
+)}
+
+<script>
+document.addEventListener("astro:page-load", () => {
+  const card = document?.getElementById("spotify-now-playing-artwork");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const MAX = 8; // degrees
+
+  if (card && !reduceMotion.matches) {
+    card.addEventListener("mousemove", (e) => {
+      const r = card.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * 2 - 1; // -1 (left) → 1 (right)
+      const y = ((e.clientY - r.top) / r.height) * 2 - 1; // -1 (top)  → 1 (bottom)
+      card.classList.add("is-tilting");
+      // The side under the cursor sinks away from the viewer
+      card.style.transform = `rotateX(${-y * MAX}deg) rotateY(${x * MAX}deg)`;
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.classList.remove("is-tilting");
+      card.style.transform = "rotateX(0) rotateY(0)";
+    });
+  }
+});
+</script>
+
+<style>
+#spotify-now-playing-artwork {
+  cursor: pointer;
+  width: 360px;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); /* ease back to flat */
+  will-change: transform;
+  box-shadow: var(--shadow-2xl);
+}
+
+#spotify-now-playing-artwork.is-tilting {
+  transition: transform 0.2s ease-out;
+}
+</style>

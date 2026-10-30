@@ -12,11 +12,24 @@ const SONG_END_BUFFER_MS = 2_000;
 // The endpoint can make two 5s Spotify calls (token + player).
 const REQUEST_TIMEOUT_MS = 12_000;
 
+const trackKey = (nowPlaying: NowPlaying | null) => nowPlaying?.songUrl ?? "";
+
+// Loads the next cover before the transition starts, so the new snapshot
+// isn't a blank image.
+async function preload(url?: string) {
+  if (!url) return;
+  const img = new Image();
+  img.src = url;
+  try {
+    await img.decode();
+  } catch {
+    // A broken image shouldn't block the update.
+  }
+}
+
 export function initNowPlaying() {
   const root = document.querySelector<HTMLElement>("[data-now-playing]");
-  const card = root?.querySelector<HTMLAnchorElement>(
-    "[data-now-playing-card]",
-  );
+  const card = root?.querySelector<HTMLElement>("[data-now-playing-card]");
   const empty = root?.querySelector<HTMLElement>("[data-now-playing-empty]");
   if (!root || !card || !empty) {
     return;
@@ -29,9 +42,14 @@ export function initNowPlaying() {
     }
   };
   const image = card.querySelector<HTMLImageElement>('[data-field="image"]');
+  const link = card.querySelector<HTMLAnchorElement>('[data-field="link"]');
 
   let current: NowPlaying | null = JSON.parse(root.dataset.initial ?? "null");
   let timer: number | undefined;
+  // Aborted by the returned cleanup, so polling stops when the page is
+  // swapped out by a client-side navigation.
+  const controller = new AbortController();
+  const { signal } = controller;
 
   function render(nowPlaying: NowPlaying | null) {
     if (!card || !empty) return;
@@ -42,7 +60,7 @@ export function initNowPlaying() {
       return;
     }
 
-    card.href = nowPlaying.songUrl;
+    if (link) link.href = nowPlaying.songUrl;
     setText("status", nowPlaying.isPlaying ? "Now playing" : "Paused");
     setText("title", nowPlaying.title);
     setText("artist", nowPlaying.artist);
@@ -50,12 +68,41 @@ export function initNowPlaying() {
     if (image) {
       image.hidden = !nowPlaying.albumImageUrl;
       if (nowPlaying.albumImageUrl) {
+        // srcset/sizes from <Image> would override the new src.
+        image.removeAttribute("srcset");
+        image.removeAttribute("sizes");
         image.src = nowPlaying.albumImageUrl;
       } else {
         image.removeAttribute("src");
       }
       image.alt = `Album art for ${nowPlaying.album}`;
     }
+  }
+
+  // Animates song changes with a same-page view transition. The
+  // view-transition-names only apply while data-track-changing is set, so
+  // they don't leak into ClientRouter navigations.
+  async function update(next: NowPlaying | null) {
+    const changed = trackKey(next) !== trackKey(current);
+    current = next;
+
+    if (
+      !changed ||
+      !document.startViewTransition ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      render(next);
+      return;
+    }
+
+    await preload(next?.albumImageUrl);
+    if (signal.aborted || !root) return;
+
+    root.dataset.trackChanging = "";
+    const transition = document.startViewTransition(() => render(next));
+    transition.finished.finally(() => {
+      delete root.dataset.trackChanging;
+    });
   }
 
   function nextDelay(nowPlaying: NowPlaying | null) {
@@ -71,7 +118,7 @@ export function initNowPlaying() {
 
   function schedule(delay: number) {
     window.clearTimeout(timer);
-    if (!document.hidden) {
+    if (!signal.aborted && !document.hidden) {
       timer = window.setTimeout(check, delay);
     }
   }
@@ -79,28 +126,40 @@ export function initNowPlaying() {
   async function check() {
     try {
       const response = await fetch(ENDPOINT, {
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.any([
+          signal,
+          AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        ]),
       });
       if (!response.ok) {
         throw new Error(`Now playing request failed: ${response.status}`);
       }
-      current = await response.json();
-      render(current);
+      const next: NowPlaying | null = await response.json();
+      await update(next);
       schedule(nextDelay(current));
     } catch {
       schedule(MAX_WAIT_MS);
     }
   }
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      window.clearTimeout(timer);
-    } else {
-      check();
-    }
-  });
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        window.clearTimeout(timer);
+      } else {
+        check();
+      }
+    },
+    { signal },
+  );
 
   schedule(
     root.dataset.failed !== undefined ? MAX_WAIT_MS : nextDelay(current),
   );
+
+  return () => {
+    controller.abort();
+    window.clearTimeout(timer);
+  };
 }

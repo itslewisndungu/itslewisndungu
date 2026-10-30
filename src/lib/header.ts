@@ -105,7 +105,14 @@ export function initHeader() {
     isInitial = false;
   }
 
+  // window outlives client-side navigations, so hand back a way to remove
+  // these listeners before the page is swapped.
+  const controller = new AbortController();
+  const { signal } = controller;
+
   updateStyles();
-  window.addEventListener("scroll", updateStyles, { passive: true });
-  window.addEventListener("resize", updateStyles);
+  window.addEventListener("scroll", updateStyles, { passive: true, signal });
+  window.addEventListener("resize", updateStyles, { signal });
+
+  return () => controller.abort();
 }

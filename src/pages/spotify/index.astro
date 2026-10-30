@@ -1,7 +1,10 @@
 ---
 export const prerender = false;
 
+import { Image } from "astro:assets";
+import SpotifyLogo from "../../assets/images/logos/spotify.svg";
 import SimpleLayout from "../../components/SimpleLayout.astro";
+import Artwork from "../../components/spotify/SpotifyArtwork.astro";
 import Layout from "../../layouts/Layout.astro";
 import {
   getNowPlaying,
@@ -39,44 +42,51 @@ Astro.response.headers.set(
       data-initial={JSON.stringify(nowPlaying)}
       data-failed={failed ? "" : undefined}
     >
-      <a
-        href={nowPlaying?.songUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+      <div
         hidden={!nowPlaying}
-        class="group flex max-w-md items-center gap-5 rounded-2xl p-4 ring-1 ring-zinc-100 transition hover:bg-zinc-50 dark:ring-zinc-700/40 dark:hover:bg-zinc-800/50"
+        class="group flex items-start gap-5 md:gap-10 rounded-2xl px-2 py-4 md:px-4"
         data-now-playing-card
       >
-        <img
-          src={nowPlaying?.albumImageUrl}
-          alt={nowPlaying ? `Album art for ${nowPlaying.album}` : ""}
-          width={80}
-          height={80}
-          hidden={!nowPlaying?.albumImageUrl}
-          class="h-20 w-20 flex-none rounded-lg object-cover"
-          data-field="image"
-        />
-        <div class="min-w-0">
+        <Artwork nowPlaying={nowPlaying} />
+
+        <a
+          href={nowPlaying?.songUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="overflow-hidden"
+          data-field="link"
+        >
+          <Image
+            height={82}
+            width={300}
+            class={"h-5 md:h-7 w-auto mt-2 md:mt-10"}
+            src={SpotifyLogo}
+            alt="Spotify Logo"
+          />
+
           <p
-            class="text-xs font-medium tracking-wide text-teal-500 uppercase"
+            class="mt-2 md:mt-5 text-xs font-medium tracking-wide text-spotify-green uppercase"
             data-field="status"
           >
             {nowPlaying?.isPlaying ? "Now playing" : "Paused"}
           </p>
+
           <p
-            class="mt-1 truncate text-base font-semibold text-zinc-800 group-hover:text-teal-500 dark:text-zinc-100"
+            class="mt-1 truncate text-base md:text-xl font-semibold text-zinc-800 group-hover:text-spotify-green dark:text-zinc-100"
             data-field="title"
           >
             {nowPlaying?.title}
           </p>
+
           <p
-            class="truncate text-sm text-zinc-600 dark:text-zinc-400"
+            class="mt-0.5 text-pretty text-sm md:text-lg text-zinc-600 dark:text-zinc-400 text"
             data-field="artist"
           >
             {nowPlaying?.artist}
           </p>
-        </div>
-      </a>
+        </a>
+      </div>
+
       <p
         hidden={!!nowPlaying}
         class="text-base text-zinc-600 dark:text-zinc-400"
@@ -88,8 +98,47 @@ Astro.response.headers.set(
   </SimpleLayout>
 </Layout>
 
+<!-- Global because the ::view-transition-* pseudo-elements live on <html>. -->
+<style is:global>
+  /* Only named during a song change, so ClientRouter navigations are unaffected. */
+  [data-now-playing][data-track-changing] #spotify-now-playing-artwork {
+    view-transition-name: np-artwork;
+  }
+  [data-now-playing][data-track-changing] [data-field="title"] {
+    view-transition-name: np-title;
+  }
+  [data-now-playing][data-track-changing] [data-field="artist"] {
+    view-transition-name: np-artist;
+  }
+
+  /* Keep text from stretching when the title width changes. */
+  ::view-transition-old(np-title),
+  ::view-transition-new(np-title),
+  ::view-transition-old(np-artist),
+  ::view-transition-new(np-artist) {
+    block-size: 100%;
+    object-fit: none;
+    object-position: left top;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none;
+    }
+  }
+</style>
+
 <script>
 import { initNowPlaying } from "../../lib/nowPlaying";
 
-initNowPlaying();
+// Module scripts run once, so re-initialise against each page's fresh DOM.
+document.addEventListener("astro:page-load", () => {
+  const cleanupNowPlaying = initNowPlaying();
+
+  document.addEventListener("astro:before-swap", () => cleanupNowPlaying?.(), {
+    once: true,
+  });
+});
 </script>
