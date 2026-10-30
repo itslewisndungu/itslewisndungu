@@ -98,6 +98,38 @@ Astro.response.headers.set(
   </SimpleLayout>
 </Layout>
 
+<!-- Global because the ::view-transition-* pseudo-elements live on <html>. -->
+<style is:global>
+  /* Only named during a song change, so ClientRouter navigations are unaffected. */
+  [data-now-playing][data-track-changing] #spotify-now-playing-artwork {
+    view-transition-name: np-artwork;
+  }
+  [data-now-playing][data-track-changing] [data-field="title"] {
+    view-transition-name: np-title;
+  }
+  [data-now-playing][data-track-changing] [data-field="artist"] {
+    view-transition-name: np-artist;
+  }
+
+  /* Keep text from stretching when the title width changes. */
+  ::view-transition-old(np-title),
+  ::view-transition-new(np-title),
+  ::view-transition-old(np-artist),
+  ::view-transition-new(np-artist) {
+    block-size: 100%;
+    object-fit: none;
+    object-position: left top;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none;
+    }
+  }
+</style>
+
 <script>
 import { initNowPlaying } from "../../lib/nowPlaying";
 

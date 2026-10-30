@@ -12,6 +12,21 @@ const SONG_END_BUFFER_MS = 2_000;
 // The endpoint can make two 5s Spotify calls (token + player).
 const REQUEST_TIMEOUT_MS = 12_000;
 
+const trackKey = (nowPlaying: NowPlaying | null) => nowPlaying?.songUrl ?? "";
+
+// Loads the next cover before the transition starts, so the new snapshot
+// isn't a blank image.
+async function preload(url?: string) {
+  if (!url) return;
+  const img = new Image();
+  img.src = url;
+  try {
+    await img.decode();
+  } catch {
+    // A broken image shouldn't block the update.
+  }
+}
+
 export function initNowPlaying() {
   const root = document.querySelector<HTMLElement>("[data-now-playing]");
   const card = root?.querySelector<HTMLElement>("[data-now-playing-card]");
@@ -64,6 +79,32 @@ export function initNowPlaying() {
     }
   }
 
+  // Animates song changes with a same-page view transition. The
+  // view-transition-names only apply while data-track-changing is set, so
+  // they don't leak into ClientRouter navigations.
+  async function update(next: NowPlaying | null) {
+    const changed = trackKey(next) !== trackKey(current);
+    current = next;
+
+    if (
+      !changed ||
+      !document.startViewTransition ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      render(next);
+      return;
+    }
+
+    await preload(next?.albumImageUrl);
+    if (signal.aborted || !root) return;
+
+    root.dataset.trackChanging = "";
+    const transition = document.startViewTransition(() => render(next));
+    transition.finished.finally(() => {
+      delete root.dataset.trackChanging;
+    });
+  }
+
   function nextDelay(nowPlaying: NowPlaying | null) {
     if (!nowPlaying?.isPlaying) {
       return IDLE_WAIT_MS;
@@ -93,8 +134,8 @@ export function initNowPlaying() {
       if (!response.ok) {
         throw new Error(`Now playing request failed: ${response.status}`);
       }
-      current = await response.json();
-      render(current);
+      const next: NowPlaying | null = await response.json();
+      await update(next);
       schedule(nextDelay(current));
     } catch {
       schedule(MAX_WAIT_MS);
