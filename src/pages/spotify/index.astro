@@ -1,6 +1,9 @@
 ---
 export const prerender = false;
 
+import { Image } from "astro:assets";
+import SpotifyLogo from "../../assets/images/logos/spotify.svg";
+import SpotifyIcon from "../../assets/images/logos/spotify-icon.png";
 import SimpleLayout from "../../components/SimpleLayout.astro";
 import Layout from "../../layouts/Layout.astro";
 import {
@@ -39,44 +42,60 @@ Astro.response.headers.set(
       data-initial={JSON.stringify(nowPlaying)}
       data-failed={failed ? "" : undefined}
     >
-      <a
-        href={nowPlaying?.songUrl}
-        target="_blank"
-        rel="noopener noreferrer"
+      <div
         hidden={!nowPlaying}
-        class="group flex max-w-md items-center gap-5 rounded-2xl p-4 ring-1 ring-zinc-100 transition hover:bg-zinc-50 dark:ring-zinc-700/40 dark:hover:bg-zinc-800/50"
+        class="group flex flex-col md:flex-row items-start md:items-center gap-8 rounded-2xl p-4"
         data-now-playing-card
       >
-        <img
-          src={nowPlaying?.albumImageUrl}
-          alt={nowPlaying ? `Album art for ${nowPlaying.album}` : ""}
-          width={80}
-          height={80}
-          hidden={!nowPlaying?.albumImageUrl}
-          class="h-20 w-20 flex-none rounded-lg object-cover"
-          data-field="image"
-        />
-        <div class="min-w-0">
+        {nowPlaying?.albumImageUrl ? (
+          <Image
+            src={nowPlaying.albumImageUrl}
+            alt={`Album art for ${nowPlaying.album}`}
+            width={400}
+            height={400}
+            layout="constrained"
+            class="size-44 md:size-90 flex-none rounded-lg object-cover"
+            data-field="image"
+          />
+        ) : null}
+
+        <a
+          href={nowPlaying?.songUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          hidden={!nowPlaying}
+        >
+          <Image
+            height={82}
+            width={300}
+            class={"h-4 md:h-7 w-auto"}
+            src={SpotifyLogo}
+            alt="Spotify Logo"
+          />
+
           <p
-            class="text-xs font-medium tracking-wide text-teal-500 uppercase"
+            class="mt-2 md:mt-4 text-xs font-medium tracking-wide text-spotify-green uppercase"
             data-field="status"
           >
             {nowPlaying?.isPlaying ? "Now playing" : "Paused"}
           </p>
+
           <p
-            class="mt-1 truncate text-base font-semibold text-zinc-800 group-hover:text-teal-500 dark:text-zinc-100"
+            class="mt-1 truncate text-base md:text-xl font-semibold text-zinc-800 group-hover:text-spotify-green dark:text-zinc-100"
             data-field="title"
           >
             {nowPlaying?.title}
           </p>
+
           <p
-            class="truncate text-sm text-zinc-600 dark:text-zinc-400"
+            class="truncate text-base md:text-lg text-zinc-600 dark:text-zinc-400"
             data-field="artist"
           >
             {nowPlaying?.artist}
           </p>
-        </div>
-      </a>
+        </a>
+      </div>
+
       <p
         hidden={!!nowPlaying}
         class="text-base text-zinc-600 dark:text-zinc-400"
