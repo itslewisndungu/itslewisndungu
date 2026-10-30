@@ -44,7 +44,7 @@ Astro.response.headers.set(
     >
       <div
         hidden={!nowPlaying}
-        class="group flex items-center gap-8 rounded-2xl p-4"
+        class="group flex flex-col md:flex-row items-start md:items-center gap-8 rounded-2xl p-4"
         data-now-playing-card
       >
         {nowPlaying?.albumImageUrl ? (
@@ -54,20 +54,10 @@ Astro.response.headers.set(
             width={400}
             height={400}
             layout="constrained"
-            class="size-40 md:size-90 flex-none rounded-lg object-cover"
+            class="size-44 md:size-90 flex-none rounded-lg object-cover"
             data-field="image"
           />
-        ) : (
-          <Image
-            src={SpotifyIcon}
-            alt=""
-            width={400}
-            height={400}
-            layout="constrained"
-            class="size-40 md:size-90 flex-none rounded-lg object-cover"
-            data-field="image"
-          />
-        )}
+        ) : null}
 
         <a
           href={nowPlaying?.songUrl}
