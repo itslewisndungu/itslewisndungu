@@ -43,7 +43,7 @@ Astro.response.headers.set(
     >
       <div
         hidden={!nowPlaying}
-        class="group flex items-start md:items-center gap-8 rounded-2xl p-4"
+        class="group flex items-start md:items-center gap-5 md:gap-8 rounded-2xl py-4 px-2"
         data-now-playing-card
       >
         {nowPlaying?.albumImageUrl ? (
@@ -53,7 +53,7 @@ Astro.response.headers.set(
             width={400}
             height={400}
             layout="constrained"
-            class="size-44 md:size-90 flex-none rounded-lg object-cover"
+            class="size-40 md:size-90 flex-none rounded-lg object-cover"
             data-field="image"
           />
         ) : null}
@@ -62,12 +62,13 @@ Astro.response.headers.set(
           href={nowPlaying?.songUrl}
           target="_blank"
           rel="noopener noreferrer"
+          class="overflow-hidden"
           hidden={!nowPlaying}
         >
           <Image
             height={82}
             width={300}
-            class={"h-4 md:h-7 w-auto"}
+            class={"h-5 md:h-7 w-auto mt-2 md:mt-0"}
             src={SpotifyLogo}
             alt="Spotify Logo"
           />
@@ -87,7 +88,7 @@ Astro.response.headers.set(
           </p>
 
           <p
-            class="truncate text-base md:text-lg text-zinc-600 dark:text-zinc-400"
+            class="mt-0.5 text-pretty text-sm md:text-lg text-zinc-600 dark:text-zinc-400 text"
             data-field="artist"
           >
             {nowPlaying?.artist}
